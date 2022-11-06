@@ -1,0 +1,68 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">ReadPriza</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        
+    }
+
+      private static async Task<HttpClient> getLoggedInClientAsync() {
+        var baseAddress = new Uri("https://hackeru.priza.net/");
+        var httpClient = new HttpClient() {
+            BaseAddress = baseAddress,
+            Timeout = TimeSpan.FromSeconds(200)
+        };
+
+        var response = await httpClient.GetAsync("/").ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+        var html = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var doc = new HtmlDocument();
+        doc.LoadHtml(html);
+        var token = doc.DocumentNode.SelectSingleNode("//input[@name='_token']");
+
+        var login = loginProvider.Value;
+
+        var content = new FormUrlEncodedContent(new[] {
+                KVP("email", login.Email),
+                KVP("password", login.Password),
+                KVP("_token", token.GetAttributeValue("value",""))
+            });
+        response = await httpClient.PostAsync("/signin", content).ConfigureAwait(false);
+        response.EnsureSuccessStatusCode();
+
+        // TODO handle failed login
+
+        return httpClient;
+    }
+}
