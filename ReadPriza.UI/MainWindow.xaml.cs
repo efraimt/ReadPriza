@@ -78,7 +78,7 @@ namespace ReadPriza.UI
 
             var content = new FormUrlEncodedContent(new[] {
                 new KeyValuePair<string,string>("username", "efraimt@gmail.com"),
-                new KeyValuePair<string,string>("pass", "Et!135792468"),
+                new KeyValuePair<string,string>("pass", ""),
 
                 //action=&action2=&userResponse=&recordId=&docType=&docPass=&ttl=&username=efraimt%40gmail.com&pass=Et%21135792468
 
